@@ -1,7 +1,6 @@
 import { useState } from 'react'
-import blogService from '../services/blogs'
 
-const Blog = ({ blog, blogs, setBlogs, currentUser, displayNotification }) => {
+const Blog = ({ blog, currentUser, onLike, onDelete }) => {
   const [detailView, setDetailView] = useState(false)
 
   const viewToggle = () => {
@@ -19,30 +18,6 @@ const Blog = ({ blog, blogs, setBlogs, currentUser, displayNotification }) => {
     }
   }
 
-  const incrementLike = async () => {
-    const updateLikes = { likes: blog.likes + 1 }
-    const updatedObject = await blogService.update(blog.id, updateLikes)
-    setBlogs(
-      blogs.map((b) =>
-        b.id === updatedObject.id ? updatedObject : b,
-      ),
-    )
-  }
-
-  const deleteBlog = async () => {
-    if (window.confirm(`remove blog ${blog.title} by ${blog.author}`)) {
-      try {
-        await blogService.remove(blog.id)
-        setBlogs(blogs.filter((b) => b.id !== blog.id))
-        displayNotification(
-          `Successfully deleted ${blog.title} by ${blog.author}`,
-        )
-      } catch (error) {
-        displayNotification(`failed, ${error.response?.data?.error}`, true)
-      }
-    }
-  }
-
   const blogStyle = {
     paddingTop: 10,
     paddingLeft: 2,
@@ -54,20 +29,23 @@ const Blog = ({ blog, blogs, setBlogs, currentUser, displayNotification }) => {
   if (detailView) {
     return (
       <div style={blogStyle}>
-        <div>
-          {blog.title} <button onClick={viewToggle}>{buttonLabel()}</button>
+        <div className='title'>
+          {blog.title}{' '}
+          <button className='detailToggleBtn' onClick={viewToggle}>
+            {buttonLabel()}
+          </button>
         </div>
-        <div>
+        <div className='url'>
           <a href={blog.url} target='_blank'>
             {blog.url}
           </a>
         </div>
-        <div>
-          likes: {blog.likes} <button onClick={incrementLike}>like</button>
+        <div className='likes'>
+          likes: {blog.likes} <button onClick={() => onLike(blog)}>like</button>
         </div>
-        <div>{blog.author}</div>
-        <div>
-          <button style={showToDelete()} onClick={deleteBlog}>
+        <div className='author'>{blog.author}</div>
+        <div className='deleteBtn'>
+          <button style={showToDelete()} onClick={() => onDelete(blog)}>
             delete
           </button>
         </div>
@@ -76,9 +54,11 @@ const Blog = ({ blog, blogs, setBlogs, currentUser, displayNotification }) => {
   }
 
   return (
-    <div style={blogStyle}>
+    <div style={blogStyle} className='headline'>
       {blog.title} {blog.author}{' '}
-      <button onClick={viewToggle}>{buttonLabel()}</button>
+      <button className='detailToggleBtn' onClick={viewToggle}>
+        {buttonLabel()}
+      </button>
     </div>
   )
 }

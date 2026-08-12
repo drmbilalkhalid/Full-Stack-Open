@@ -79,9 +79,32 @@ const App = () => {
         setUser(null)
       } else {
         const errorMessage = error.response?.data?.error
-        displayNotification(`failed, ${errorMessage === undefined ? 'something went wrong' : errorMessage}`, true)
+        displayNotification(
+          `failed, ${errorMessage === undefined ? 'something went wrong' : errorMessage}`,
+          true,
+        )
       }
     }
+  }
+
+  const deleteBlog = async (blog) => {
+    if (window.confirm(`remove blog ${blog.title} by ${blog.author}`)) {
+      try {
+        await blogService.remove(blog.id)
+        setBlogs(blogs.filter((b) => b.id !== blog.id))
+        displayNotification(
+          `Successfully deleted ${blog.title} by ${blog.author}`,
+        )
+      } catch (error) {
+        displayNotification(`failed, ${error.response?.data?.error}`, true)
+      }
+    }
+  }
+
+  const incrementLike = async (blog) => {
+    const updateLikes = { likes: blog.likes + 1 }
+    const updatedObject = await blogService.update(blog.id, updateLikes)
+    setBlogs(blogs.map((b) => (b.id === updatedObject.id ? updatedObject : b)))
   }
 
   const newBlogFormRef = useRef()
@@ -110,10 +133,9 @@ const App = () => {
         <Blog
           key={blog.id}
           blog={blog}
-          blogs={blogs}
-          setBlogs={setBlogs}
           currentUser={user}
-          displayNotification={displayNotification}
+          onLike={incrementLike}
+          onDelete={deleteBlog}
         />
       ))}
     </div>
