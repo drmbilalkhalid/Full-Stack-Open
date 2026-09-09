@@ -22,6 +22,15 @@ const currentUser = {
   username: 'bills',
 }
 
+const noUser = null
+
+const anotherUser = {
+  name: 'anotherUser',
+  token:
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImJdbGxzIiwiaWQiOiI2YTVjYTRiZDY3ZTBiNWZkODI4MGM4YjIiLCJpYXQiOjE3ODY1MDQ0MzgsImV4cCI6MTc5NjUwODAzOH0.a--P_SP2CMRVTs0Cj5T-lDm_pdZu92FKcH2D4vTlTZP',
+  username: 'anda',
+}
+
 describe('<Blog /> tests', () => {
   let incrementLike
   let deleteBlog
@@ -29,7 +38,55 @@ describe('<Blog /> tests', () => {
   beforeEach(() => {
     incrementLike = vi.fn()
     deleteBlog = vi.fn()
+  })
 
+  test('Blog information and number of likes are displayed to unauthenticated users but not buttons', () => {
+    render(
+      <Blog
+        blog={blog}
+        currentUser={noUser}
+        onLike={incrementLike}
+        onDelete={deleteBlog}
+      />,
+    )
+
+    expect(screen.getByText(`${blog.title}`)).toBeVisible()
+    expect(screen.getByText(`likes: ${blog.likes}`)).toBeVisible()
+    expect(screen.getByText(`Added By ${blog.author}`)).toBeVisible()
+    expect(screen.getByText(`${blog.url}`)).toBeVisible()
+
+    expect(
+      screen.queryByRole('button', { name: 'like' }),
+    ).not.toBeInTheDocument()
+    expect(
+      screen.queryByRole('button', { name: 'remove' }),
+    ).not.toBeInTheDocument()
+  })
+
+  test('authenticated users who are not the creator see only the like button and can click the like button', async () => {
+    render(
+      <Blog
+        blog={blog}
+        currentUser={anotherUser}
+        onLike={incrementLike}
+        onDelete={deleteBlog}
+      />,
+    )
+    const user = userEvent.setup()
+
+    const likeBtn = screen.getByRole('button', { name: 'like' })
+    expect(likeBtn).toBeVisible()
+
+    await user.click(likeBtn)
+    await user.click(likeBtn)
+    expect(incrementLike.mock.calls).toHaveLength(2)
+
+    expect(
+      screen.queryByRole('button', { name: 'remove' }),
+    ).not.toBeInTheDocument()
+  })
+
+  test('the creator is shown both the like and remove buttons and can click it', async () => {
     render(
       <Blog
         blog={blog}
@@ -38,38 +95,14 @@ describe('<Blog /> tests', () => {
         onDelete={deleteBlog}
       />,
     )
-  })
-
-  test('Initally Blog only render the title and name of the author', () => {
-    expect(screen.getByText(`${blog.title} ${blog.author}`)).toBeVisible()
-    expect(screen.queryByText(blog.url)).not.toBeInTheDocument()
-    expect(
-      screen.queryByText('likes:', { exact: false }),
-    ).not.toBeInTheDocument()
-  })
-
-  test('when view button click the likes and url renders', async () => {
     const user = userEvent.setup()
 
-    const viewBtn = screen.getByRole('button', { name: 'view' })
-
-    await user.click(viewBtn)
-
-    expect(screen.getByText(blog.url)).toBeVisible()
-    expect(
-      screen.getByText(`likes: ${blog.likes}`, { exact: false }),
-    ).toBeVisible()
-  })
-
-  test('button clicks and the invoke event handler the right number of time', async () => {
-    const user = userEvent.setup()
-    await user.click(screen.getByRole('button', { name: 'view' }))
-
+    const removeBtn = screen.getByRole('button', { name: 'remove' })
     const likeBtn = screen.getByRole('button', { name: 'like' })
+    expect(removeBtn).toBeVisible()
+    expect(likeBtn).toBeVisible()
 
-    await user.click(likeBtn)
-    await user.click(likeBtn)
-    expect(incrementLike.mock.calls).toHaveLength(2)
-
+    await user.click(removeBtn)
+    expect(deleteBlog.mock.calls).toHaveLength(1)
   })
 })
