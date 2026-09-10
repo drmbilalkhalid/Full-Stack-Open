@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import Notification from './Notification'
+import { Input, TextField, Button } from '@mui/material'
 
 const LoginForm = ({ login }) => {
   const [username, setUsername] = useState('')
@@ -7,34 +8,32 @@ const LoginForm = ({ login }) => {
 
   const handleLoginForm = (event) => {
     event.preventDefault()
+    console.log(username, password)
     login({ username, password })
   }
-
+  
   return (
     <div>
       <h2>Login in to application</h2>
       <form onSubmit={handleLoginForm}>
         <div>
-          <label>
-            username{' '}
-            <input
-              type='text'
-              value={username}
-              onChange={(event) => setUsername(event.target.value)}
-            />
-          </label>
+          <TextField
+            variant='standard'
+            label='username'
+            value={username}
+            onChange={(event) => setUsername(event.target.value)}
+          />
         </div>
         <div>
-          <label>
-            password{' '}
-            <input
-              type='password'
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
-            />
-          </label>
+          <TextField
+            variant='standard'
+            label='password'
+            type='password'
+            value={password}
+            onChange={(event) => setPassword(event.target.value)}
+          />
         </div>
-        <button type='submit'>login</button>
+        <Button style={{ marginTop: 10 }} variant='contained' type='submit'>login</Button>
       </form>
     </div>
   )

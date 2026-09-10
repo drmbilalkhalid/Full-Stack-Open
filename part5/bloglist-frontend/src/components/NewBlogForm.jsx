@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { TextField, Button } from '@mui/material'
 
 const NewBlogForm = ({ createNewBlog }) => {
   const [title, setTitle] = useState('')
@@ -19,41 +20,45 @@ const NewBlogForm = ({ createNewBlog }) => {
     }
   }
 
+  const marginB = {
+    marginBottom: 1
+  }
+
   return (
     <div>
       <h2>create new</h2>
       <form onSubmit={handleCreateNewBlog}>
         <div>
-          <label>
-            title{' '}
-            <input
-              type='text'
-              value={title}
-              onChange={(event) => setTitle(event.target.value)}
-            />
-          </label>
+          <TextField
+            variant='outlined'
+            label='title'
+            value={title}
+            onChange={(event) => setTitle(event.target.value)}
+            size='small'
+            sx={marginB}
+          />
         </div>
         <div>
-          <label>
-            author{' '}
-            <input
-              type='text'
-              value={author}
-              onChange={(event) => setAuthor(event.target.value)}
-            />
-          </label>
+          <TextField
+            variant='outlined'
+            label='author'
+            value={author}
+            onChange={(event) => setAuthor(event.target.value)}
+            size='small'
+            sx={marginB}
+          />
         </div>
         <div>
-          <label>
-            url{' '}
-            <input
-              type='text'
-              value={url}
-              onChange={(event) => setUrl(event.target.value)}
-            />
-          </label>
+          <TextField
+            variant='outlined'
+            label='url'
+            value={url}
+            onChange={(event) => setUrl(event.target.value)}
+            size='small'
+            sx={marginB}
+          />
         </div>
-        <button type='submit'>create</button>
+        <Button variant='contained' type='submit'>create</Button>
       </form>
     </div>
   )

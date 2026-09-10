@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link, Routes, Route, useNavigate, useMatch } from 'react-router-dom'
+import { AppBar, Toolbar, Button, IconButton, Typography } from '@mui/material'
 import blogService from './services/blogs'
 import Notification from './components/Notification'
 import LoginService from './services/login'
@@ -119,14 +120,39 @@ const App = () => {
 
   const blog = match ? blogs.find((blog) => blog.id === match.params.id) : null
 
+  const marginL = {
+    marginLeft: 22,
+  }
+
   return (
-    <div>
-      <div>
-        <Link to='/'>blogs</Link> <Link to={'/create'}>new blog</Link>{' '}
-        <Link to='/login'>
-          {user ? <button onClick={handleLogout}>logout</button> : 'login'}
-        </Link>
-      </div>
+    <div style={marginL}>
+      <AppBar position='static'>
+        <Toolbar>
+          <Typography variant='h6' component='div' sx={{ flexGrow: 1 }}>
+            Blog App
+          </Typography>
+
+          <Button color='inherit' component={Link} to='/'>
+            BLOGS
+          </Button>
+
+          {user ? (
+            <Button color='inherit' component={Link} to='/create'>
+              NEW BLOG
+            </Button>
+          ) : null}
+
+          {user ? (
+            <Button color='inherit' onClick={handleLogout}>
+              LOGOUT
+            </Button>
+          ) : (
+            <Button color='inherit' component={Link} to='/login'>
+              LOGIN
+            </Button>
+          )}
+        </Toolbar>
+      </AppBar>
 
       <Routes>
         <Route
